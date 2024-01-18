@@ -1,0 +1,13 @@
+{
+	"name": "lesscode",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js 8000"
+	},
+	"dependencies": {
+		"total5": "beta"
+	},
+	"author": "Total.js",
+	"license": "MIT"
+}
