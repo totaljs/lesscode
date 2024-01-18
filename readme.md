@@ -9,6 +9,8 @@ __Requirements__:
 
 ## Installation
 
+The app will show you access to the Flow editor in the terminal/command-line output.
+
 __Manual installation__:
 
 - install the Node.js platform (+v19) (https://nodejs.org)
