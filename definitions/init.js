@@ -3,7 +3,7 @@ var ID = '';
 
 Flow.on('save', function(schema) {
 	schema.dtupdated = new Date();
-	var data = JSON.stringify(schema);
+	var data = JSON.stringify(schema, null, '\t');
 	F.Fs.writeFile(Filename, data, ERROR('Flow.save'));
 	CONF.backup && F.Fs.appendFile(Filename + '.bk', data + '\n', NOOP);
 });
@@ -31,7 +31,7 @@ ON('ready', function() {
 
 // Load websocket
 // max. 8 MB
-ROUTE('+SOCKET  /flow/ <8MB', function($) {
+ROUTE('SOCKET  /flow/ <8MB', function($) {
 
 	$.autodestroy();
 	$.on('open', function(client) {
