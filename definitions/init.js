@@ -34,16 +34,11 @@ ON('ready', function() {
 ROUTE('SOCKET  /flow/ <8MB', function($) {
 
 	$.autodestroy();
-	$.on('open', function(client) {
-
-		if (BLOCKED(client, 10))
+	Flow.socket(ID, $, function(client) {
+		if (BLOCKED(client, 10) || CONF.token !== client.query.token)
 			return;
-
-		if (CONF.token !== client.query.token)
-			return;
-
-		Flow.socket(ID, $);
 		BLOCKED(client, -1);
+		return true;
 	});
 
 });
