@@ -15,7 +15,7 @@ ON('ready', function() {
 		let divider = '----------------------------------------------------';
 		console.log(divider);
 		console.log('Edit FlowStreams:');
-		console.log('http://{$ip}:{$port}/flowstreams/?token={token}'.args(CONF));
+		console.log('http://127.0.0.1:{$port}/flowstreams/?token={token}'.args(CONF));
 		console.log(divider);
 		console.log();
 
