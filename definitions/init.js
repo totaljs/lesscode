@@ -1,41 +1,54 @@
-const Filename = PATH.databases('schema.flow');
-var ID = '';
+function makepath(name) {
+	return PATH.databases('flowstreams' + (name ? ('/' + name + '.flow') : ''));
+}
 
 Flow.on('save', function(schema) {
 	schema.dtupdated = new Date();
 	var data = JSON.stringify(schema, null, '\t');
-	F.Fs.writeFile(Filename, data, ERROR('Flow.save'));
-	CONF.backup && F.Fs.appendFile(Filename + '.bk', data + '\n', NOOP);
+	F.Fs.writeFile(makepath(schema.id), data, ERROR('Flow.save'));
+	CONF.backup && F.Fs.appendFile(PATH.databases(schema.id + '.bk'), data + '\n', NOOP);
 });
 
 ON('ready', function() {
 	setTimeout(function() {
 
-		let divider = '====================================================';
-
+		let divider = '----------------------------------------------------';
 		console.log(divider);
-		console.log('https://flow.totaljs.com/?socket=' + encodeURIComponent('http://127.0.0.1:{$port}/flow/?token={token}'.args(CONF)));
+		console.log('Edit FlowStreams:');
+		console.log('http://{$ip}:{$port}/flowstreams/?token={token}'.args(CONF));
 		console.log(divider);
 		console.log();
 
-		F.Fs.readFile(Filename, 'utf8', function(err, response) {
-			var data = response.parseJSON(true);
-			if (!data.id)
-				data.id = GUID(5);
-			ID = data.id;
-			Flow.load(data, ERROR('Flow.load'));
-		});
+		F.Fs.readdir(makepath(), function(err, response) {
+			response.wait(async function(filename, next) {
 
+				if (!filename.endsWith('.flow')) {
+					next();
+					return;
+				}
+
+				var id = filename.replace(/\.flow/i, '').toLowerCase();
+				var flowstream = await F.readfile(makepath(id), 'utf8');
+
+				flowstream = flowstream.parseJSON(true);
+				flowstream.id = id;
+
+				Flow.load(flowstream, function(err) {
+					err && console.error('Flow load ERROR:', err);
+					next();
+				});
+			});
+		});
 	}, 1000);
 });
 
 // Load websocket
 // max. 8 MB
-ROUTE('SOCKET  /flow/ <8MB', function($) {
+ROUTE('SOCKET /flowstreams/{id}/ <8MB', function($) {
 
 	$.autodestroy();
 
-	Flow.socket(ID, $, function(client, next) {
+	Flow.socket($.params.id, $, function(client, next) {
 		if (BLOCKED(client, 10) || CONF.token !== client.query.token) {
 			client.destroy();
 		} else {
@@ -44,4 +57,21 @@ ROUTE('SOCKET  /flow/ <8MB', function($) {
 		}
 	});
 
+});
+
+ROUTE('GET /flowstreams/', function($) {
+
+	if (BLOCKED($, 10) || CONF.token !== $.query.token) {
+		$.invalid(401);
+		return;
+	}
+
+	var builder = ['<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name)];
+
+	for (let key in Flow.instances)
+		builder.push('<li><a href="https://flow.totaljs.com?socket={0}" target="_blank">{1}</a></li>'.format(encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
+
+	builder.push('</ul></body></html>');
+	$.html(builder.join('\n'));
+	BLOCKED($, -1);
 });
