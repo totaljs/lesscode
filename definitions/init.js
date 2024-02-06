@@ -1,5 +1,5 @@
 function makepath(name) {
-	return PATH.databases('flowstreams' + (name ? ('/' + name + '.flow') : ''));
+	return PATH.databases('flowstreams' + (name ? ('/' + name + '.json') : ''));
 }
 
 Flow.on('save', function(schema) {
@@ -22,12 +22,12 @@ ON('ready', function() {
 		F.Fs.readdir(makepath(), function(err, response) {
 			response.wait(async function(filename, next) {
 
-				if (!filename.endsWith('.flow')) {
+				if (!filename.endsWith('.json')) {
 					next();
 					return;
 				}
 
-				var id = filename.replace(/\.flow/i, '').toLowerCase();
+				var id = filename.replace(/\.json/i, '').toLowerCase();
 				var flowstream = await F.readfile(makepath(id), 'utf8');
 
 				flowstream = flowstream.parseJSON(true);
