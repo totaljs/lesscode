@@ -1,2 +1,3 @@
 token    (generate)   : 30
 backup                : false
+floweditor            : https://flow.totaljs.com

@@ -66,12 +66,25 @@ ROUTE('GET /flowstreams/', function($) {
 		return;
 	}
 
-	var builder = ['<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name)];
+	var builder = [];
+	var editor = CONF.floweditor || 'https://flow.totaljs.com';
 
-	for (let key in Flow.instances)
-		builder.push('<li><a href="https://flow.totaljs.com?socket={0}" target="_blank">{1}</a></li>'.format(encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
+	if ($.xhr) {
 
-	builder.push('</ul></body></html>');
-	$.html(builder.join('\n'));
+		for (let key in Flow.instances) {
+			let db = Flow.db[key];
+			builder.push({ id: key, name: db.name, icon: db.icon, color: db.color, readme: db.readme, url: editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))) });
+		}
+
+		$.json(builder);
+
+	} else {
+		builder.push('<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name));
+		for (let key in Flow.instances)
+			builder.push('<li><a href="{0}?socket={1}" target="_blank">{1}</a></li>'.format(encodeURIComponent(editor, $.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
+		builder.push('</ul></body></html>');
+		$.html(builder.join('\n'));
+	}
+
 	BLOCKED($, -1);
 });
