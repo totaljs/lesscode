@@ -1,1 +1,5 @@
 /databases/config.json
+/index.js.json
+/.gitignore
+/index.js.map
+/index.pid
