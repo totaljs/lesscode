@@ -81,7 +81,7 @@ ROUTE('GET /flowstreams/', function($) {
 	} else {
 		builder.push('<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name));
 		for (let key in Flow.instances)
-			builder.push('<li><a href="{0}?socket={1}" target="_blank">{1}</a></li>'.format(encodeURIComponent(editor, $.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
+			builder.push('<li><a href="{0}" target="_blank">{1}</a></li>'.format(editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
 		builder.push('</ul></body></html>');
 		$.html(builder.join('\n'));
 	}
