@@ -69,11 +69,14 @@ ROUTE('GET /flowstreams/', function($) {
 	var builder = [];
 	var editor = CONF.floweditor || 'https://flow.totaljs.com';
 
-	if ($.xhr) {
+	if ($.xhr || $.query.type === 'json') {
 
 		for (let key in Flow.instances) {
 			let db = Flow.db[key];
-			builder.push({ id: key, name: db.name, icon: db.icon, color: db.color, readme: db.readme, url: editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))) });
+			let instance = Flow.instances[key];
+			let stats = instance.stats;
+			let newstats = stats ? { memory: stats.memory, messages: stats.messages, pending: stats.pending, minutes: stats.minutes, paused: stats.paused, mm: stats.mm, errors: stats.errors } : EMPTYOBJECT;
+			builder.push({ id: key, name: db.name, icon: db.icon, color: db.color, readme: db.readme, url: editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), stats: newstats });
 		}
 
 		$.json(builder);
