@@ -2,7 +2,7 @@ function makepath(name) {
 	return PATH.databases('flowstreams' + (name ? ('/' + name + '.json') : ''));
 }
 
-Flow.on('save', function(schema) {
+CONF.ui && Flow.on('save', function(schema) {
 	schema.dtupdated = new Date();
 	var data = JSON.stringify(schema, null, '\t');
 	F.Fs.writeFile(makepath(schema.id), data, ERROR('Flow.save'));
@@ -12,12 +12,14 @@ Flow.on('save', function(schema) {
 ON('ready', function() {
 	setTimeout(function() {
 
-		let divider = '----------------------------------------------------';
-		console.log(divider);
-		console.log('Edit FlowStreams:');
-		console.log('http://127.0.0.1:{$port}/flowstreams/?token={token}'.args(CONF));
-		console.log(divider);
-		console.log();
+		if (CONF.ui) {
+			let divider = '----------------------------------------------------';
+			console.log(divider);
+			console.log('Edit FlowStreams:');
+			console.log('http://127.0.0.1:{$port}/flowstreams/?token={token}'.args(CONF));
+			console.log(divider);
+			console.log();
+		}
 
 		F.Fs.readdir(makepath(), function(err, response) {
 			response.wait(async function(filename, next) {
@@ -44,7 +46,7 @@ ON('ready', function() {
 
 // Load websocket
 // max. 8 MB
-ROUTE('SOCKET /flowstreams/{id}/ <8MB', function($) {
+CONF.ui && ROUTE('SOCKET /flowstreams/{id}/ <8MB', function($) {
 
 	$.autodestroy();
 
@@ -59,7 +61,7 @@ ROUTE('SOCKET /flowstreams/{id}/ <8MB', function($) {
 
 });
 
-ROUTE('GET /flowstreams/', function($) {
+CONF.ui && ROUTE('GET /flowstreams/', function($) {
 
 	if (BLOCKED($, 10) || CONF.token !== $.query.token) {
 		$.invalid(401);

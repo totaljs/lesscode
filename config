@@ -1,3 +1,11 @@
+// Security token
 token    (generate)   : 30
+
+// Enables backups
 backup                : false
+
+// Enables UI
+ui                    : true
+
+// Flow editor
 floweditor            : https://flow.totaljs.com
