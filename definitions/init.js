@@ -81,8 +81,7 @@ CONF.ui && ROUTE('GET /flowstreams/', function($) {
 			builder.push({ id: key, name: db.name, icon: db.icon, color: db.color, readme: db.readme, url: editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), stats: newstats });
 		}
 
-		$.json({ name: CONF.name, stats: F.consumption
-			, items: builder });
+		$.json({ name: CONF.name, stats: F.consumption, items: builder });
 
 	} else {
 		builder.push('<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name));
