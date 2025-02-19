@@ -51,21 +51,26 @@ CONF.ui && ROUTE('SOCKET /flowstreams/{id}/ <8MB', function($) {
 	$.autodestroy();
 
 	Flow.socket($.params.id, $, function(client, next) {
-		if (BLOCKED(client, 10) || CONF.token !== client.query.token) {
-			client.destroy();
-		} else {
-			BLOCKED(client, -1);
+		if (CONF.token) {
+			if (BLOCKED(client, 10) || CONF.token !== client.query.token) {
+				client.destroy();
+			} else {
+				BLOCKED(client, -1);
+				next();
+			}
+		} else
 			next();
-		}
 	});
 
 });
 
 CONF.ui && ROUTE('GET /flowstreams/', function($) {
 
-	if (BLOCKED($, 10) || CONF.token !== $.query.token) {
-		$.invalid(401);
-		return;
+	if (CONF.token) {
+		if (BLOCKED($, 10) || CONF.token !== $.query.token) {
+			$.invalid(401);
+			return;
+		}
 	}
 
 	var builder = [];
