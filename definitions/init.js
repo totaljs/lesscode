@@ -16,7 +16,7 @@ ON('ready', function() {
 			let divider = '----------------------------------------------------';
 			console.log(divider);
 			console.log('Edit FlowStreams:');
-			console.log('http://127.0.0.1:{$port}/flowstreams/?token={token}'.args(CONF));
+			console.log(('http://127.0.0.1:{$port}/flowstreams/' + (CONF.token ? '?token={token}' : '')).args(CONF));
 			console.log(divider);
 			console.log();
 		}
@@ -32,7 +32,7 @@ ON('ready', function() {
 				var id = filename.replace(/\.json/i, '').toLowerCase();
 				var flowstream = await F.readfile(makepath(id), 'utf8');
 
-				flowstream = flowstream.parseJSON(true);
+				flowstream = flowstream.parseJSON(true) || {};
 				flowstream.id = id;
 
 				Flow.load(flowstream, function(err) {
@@ -91,7 +91,7 @@ CONF.ui && ROUTE('GET /flowstreams/', function($) {
 	} else {
 		builder.push('<html><head><meta charset="utf-8" /><title>{0}</title></head><body style="padding:20px;font-family:Arial"><div>FlowStreams:</div><ul>'.format(CONF.name));
 		for (let key in Flow.instances)
-			builder.push('<li><a href="{0}" target="_blank">{1}</a></li>'.format(editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/?token={1}'.format(key, CONF.token))), key));
+			builder.push('<li><a href="{0}" target="_blank">{1}</a></li>'.format(editor + '?socket=' + encodeURIComponent($.hostname('/flowstreams/{0}/'.format(key, CONF.token ? '?token={1}'.format(CONF.token) : ''))), key));
 		builder.push('</ul></body></html>');
 		$.html(builder.join('\n'));
 	}
