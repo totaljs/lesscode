@@ -1,5 +1,5 @@
 // Security token
-token    (generate)   : 30
+// token    (generate)   : 30
 
 // Enables backups
 backup                : false
