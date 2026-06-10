@@ -1,19 +1,11 @@
 # LessCode
 
-The Total.js LessCode app uses the Total.js Flow engine for quickly creating API endpoints. Run, code and release.
+The Total.js LessCode app uses the Total.js Flow engine for quickly creating services, workflows, AI agents or API endpoints. Run, code and release.
 
 __Requirements__:
 
 - Total.js `v5`
 - Node.js `+v19`
-
-## Good to know
-
-- FlowStream files must be generated manually and stored in `/databases/flowstreams/{name|id}.json`
-- FlowStream identifier is always taken from the filename. E.g., `registration.json`, identifier is `registration`
-- How to edit FlowStream? Visit <http://127.0.0.1:8000/flowstreams/?token=YOUR_TOKEN_GENERATED_BY_THE_APP>
-- How to obtain a list of FlowStreams in JSON format? Visit <http://127.0.0.1:8000/flowstreams/?token=YOUR_TOKEN_GENERATED_BY_THE_APP> as `XMLHttpRequest`
-- FlowStreams are part of the main thread (Flow worker is disabled)
 
 ## Installation
 
