@@ -10,7 +10,6 @@ RUN mkdir -p /www/bundles
 COPY index.js .
 COPY package.json .
 COPY /--bundles--/app.bundle ./bundles/
-COPY /--bundles--/bookmarks.bundle ./bundles/
 
 RUN npm install
 EXPOSE 8000
