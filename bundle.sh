@@ -16,30 +16,18 @@ console.time('|-- Compilation');
 
 console.log('| |--', 'app.bundle');
 Total.backup(path + '/app.bundle', PATH.root(), function() {
-	F.Fs.readdir(PATH.root('plugins'), function(err, response) {
-
-		if (err) {
-			console.timeEnd('|-- Compilation');
-			return;
-		}
-
-		response.wait(function(key, next) {
-			buildplugin(key, next);
-		}, function() {
-			console.timeEnd('|-- Compilation');
-		});
-	});
+	console.timeEnd('|-- Compilation');
 }, function(path, isdir) {
 
 	if (!isdir)
-		return path.split('/').length > 2;
+		return path.split('/').length > 2 || path == '/extensions.js' || path === '/version';
 
 	var p = path.split('/').trim();
 
 	if (!p[0] || (p.length === 1 && p[0] === 'plugins'))
 		return true;
 
-	var allowed = ['databases', 'definitions'];
+	var allowed = ['actions', 'controllers', 'definitions', 'modules', 'public', 'schemas', 'views', 'resources'];
 
 	for (var m of allowed) {
 		if (path.indexOf(m) === 1)
