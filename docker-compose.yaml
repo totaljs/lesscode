@@ -5,7 +5,4 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - data:/www/flowstreams
-
-volumes:
-  data:
+      - ./flowstreams:/www/flowstreams
