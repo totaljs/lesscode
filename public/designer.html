@@ -1585,7 +1585,7 @@ var total = 'Hello world!';
 			};
 
 			exports.clipboard = function(el) {
-				SETTER('clipboard/copy', $(el).text());
+				SETTER('clipboard/copy @copied', $(el).text());
 			};
 
 			exports.group = function(item) {
