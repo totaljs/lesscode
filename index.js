@@ -36,7 +36,7 @@ Flow.on('save', function(schema) {
 
 ON('flowstream', function(flow) {
 	Total.syslog('Flow "{id}" is running.'.args(flow));
-})
+});
 
 ROUTE('SOCKET / <8MB', function($) {
 	$.autodestroy();
