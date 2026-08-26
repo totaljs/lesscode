@@ -193,6 +193,15 @@
 		.listing.small .selection { margin-top: 0; }
 		.ui-dark .selection { border-color: #303030; background-color: #222; color: #FFF; }
 
+		.factivity { font-size: 10px; border-top: 1px solid #E0E0E0; padding: 4px 8px 6px; color: #999; }
+		.factivity .hellip > i:first-child { color: #B9261A; margin-right: 3px; }
+		.factivity_bar { background-color: #F0F0F0; border-radius: var(--radius); margin-top: 1px; }
+		.factivity_bar > div { background-color: var(--color); border-radius: var(--radius); text-align: right; height: 4px; }
+
+		.ui-dark .factivity { border-top-color: #404040; color: #999; }
+		.ui-dark .factivity .hellip > i:first-child { color: #ff5953; }
+		.ui-dark .factivity_bar { background-color: #303030; }
+
 		@keyframes colorize {
 			0% { color: #d7cd17; }
 			15% { color: #83c83c; }
@@ -984,7 +993,11 @@ var total = 'Hello world!';
 
 		var flow = {};
 
-		flow.socket = (NAV.query.socket || location.origin).replace(/^http/i, 'ws') + '/';
+		flow.socket = (NAV.query.socket || location.origin).replace(/^http/i, 'ws');
+
+		if (!flow.socket.includes('?'))
+			flow.socket += '/';
+
 		flow.current = ''; // temporary
 		flow.checksum = ''; // temporary
 		flow.editable = { pause: true, config: true, trigger: true, design: true, download: true, tms: true, restart: true, variables: true, components: { create: true, update: true, remove: true, download: 'https://cdn.totaljs.com/flowstream/webcomponents/db.json' }};
@@ -1029,6 +1042,12 @@ var total = 'Hello world!';
 		flow.variables2 = {};
 		flow.components = [];
 		flow.callbacks = {};
+		flow.activities = {};
+
+		var Tactivity = Tangular.compile(`<div class="factivity" data-id="{{ key }}_{{ value }}">
+	<div class="hellip"><i class="ti ti-circle-notch ti-spin"></i>{{ name | raw }} {{ if value != null }}({{ value }}%){{ fi }}</div>
+	{{ if value != null }}<div class="factivity_bar"><div style="width:{{ value2 }}%"></div></div>{{ fi }}
+</div>`);
 
 		EXTENSION('websocket', function(com) {
 			com.send2 = com.send;
@@ -1111,6 +1130,38 @@ var total = 'Hello world!';
 						// msg.worker {Boolean}
 						break;
 
+					case 'flow/activity':
+						// msg.id
+						// msg.name
+						// msg.uid
+						// msg.value
+						if (!model.activities[msg.id])
+							model.activities[msg.id] = {};
+						if (msg.name)
+							model.activities[msg.id][msg.key] = Tactivity({ id: msg.id, key: msg.key, name: msg.name, value: msg.value, value2: msg.value == null ? null : Math.ceil(msg.value) });
+						else
+							delete model.activities[msg.id][msg.key];
+						exports.refresh_activity(msg.id);
+						break;
+
+					case 'flow/activities':
+						// msg.data
+						for (let key in msg.data) {
+							if (!model.activities[key])
+								model.activities[key] = {};
+							let tmp = msg.data[key];
+							for (let key2 in tmp) {
+								let obj = tmp[key2];
+								if (obj.name)
+									model.activities[key][key2] = Tactivity({ id: key, key: key2, name: obj.name, value: obj.value, value2: obj.value == null ? null : Math.ceil(obj.value) });
+								else
+									delete model.activities[key][key2];
+							}
+
+							exports.refresh_activity(key);
+						}
+						break;
+
 					case 'flow/variables':
 					case 'flow/variables2':
 						// msg.data; {Object}
@@ -1161,6 +1212,8 @@ var total = 'Hello world!';
 						// |-- item.y {Number}
 						// |-----
 						// |-- groups {Array}
+						$('.factivities').empty();
+						model.activities = {};
 						exports.load_design(msg.data);
 						break;
 
@@ -1310,6 +1363,8 @@ var total = 'Hello world!';
 						exports.upd('config.' + msg.id);
 						exports.upd('notes.' + msg.id);
 						Designer.CMD('flow.refresh');
+						delete flow.activities[msg.id];
+						$('#factivities_' + msg.id).empty();
 						setTimeout(msg => model.main.exec(msg.id, 'redraw'), 100, msg);
 						break;
 
@@ -1333,6 +1388,14 @@ var total = 'Hello world!';
 						break;
 				}
 			});
+
+			exports.refresh_activity = function(id) {
+				let container = $('#factivities_' + id);
+				let builder = [];
+				for (let key in flow.activities[id])
+					builder.push(flow.activities[id][key]);
+				DIFFDOM(container, '.factivity', builder.join('\n'), 'data-id');
+			};
 
 			exports.log = function(type, body) {
 				model.logs.unshift({ type: type, body: body });
@@ -1471,6 +1534,7 @@ var total = 'Hello world!';
 					content = el.find('.content');
 
 				content.append('<summ' + 'ary class="hidden" path="?.notes.' + t.id + '" config="show;html div:Thelpers.markdown(value, { element: el })"><span class="towindow exec" data-exec="?/notewindow"><i class="ti ti-window-alt"></i></span><span>@(Note)</span><div class="noscrollbar selectable markdown-small"></div></summ' + 'ary>');
+				el.find('.area').append('<div class="factivities" id="factivities_{0}"></div>'.format(t.id));
 
 				let target = el.closest('.component').attr('path', '?.errors.' + t.id).attr('config', '.iserror:value&&value.length;title:value?value[0].error\:\'\'').tclass('isnewbie', !t.connected).tclass('iserror', !!model.errors[t.id]);
 
