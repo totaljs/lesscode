@@ -6,7 +6,7 @@
 		"start": "node index.js 8000"
 	},
 	"dependencies": {
-		"total5": "beta"
+		"total5": "latest"
 	},
 	"author": "Total.js",
 	"license": "MIT"
