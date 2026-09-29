@@ -1814,7 +1814,8 @@ var total = 'Hello world!';
 
 				let component = model.components.findItem('id', instance.component);
 				if (!component || !component.settings) {
-					SETTER('notify/warning', '@(No settings available)');
+					FUNC.readme(instance.Component.name, instance.Component.readme);
+					// SETTER('notify/warning', '@(No settings available)');
 					return;
 				}
 
