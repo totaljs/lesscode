@@ -2596,7 +2596,7 @@ var total = 'Hello world!';
 						}
 					};
 					reader.readAsText(file);
-				});
+				}, () => FLAGS('@hideloading'));
 			};
 
 			exports.search = function() {
